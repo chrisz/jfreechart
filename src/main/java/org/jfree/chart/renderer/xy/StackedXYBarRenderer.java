@@ -321,13 +321,23 @@ public class StackedXYBarRenderer extends XYBarRenderer {
         if (Double.isNaN(startX)) {
             return;
         }
-        double translatedStartX = domainAxis.valueToJava2D(startX, dataArea,
-                edgeD);
 
         double endX = intervalDataset.getEndXValue(series, item);
         if (Double.isNaN(endX)) {
             return;
         }
+
+        // is there an alignment adjustment to be made?
+        if (this.getBarAlignmentFactor() >= 0.0 &&
+                this.getBarAlignmentFactor() <= 1.0) {
+            double x = intervalDataset.getXValue(series, item);
+            double interval = endX - startX;
+            startX = x - interval * this.getBarAlignmentFactor();
+            endX = startX + interval;
+        }
+
+        double translatedStartX = domainAxis.valueToJava2D(startX, dataArea,
+                edgeD);
         double translatedEndX = domainAxis.valueToJava2D(endX, dataArea, edgeD);
 
         double translatedWidth = Math.max(1, Math.abs(translatedEndX
